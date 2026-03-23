@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BRC — Boracell Admin</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="4" fill="#cc1c1c"/><rect x="9" y="22" width="4" height="10" rx="1" fill="white"/><rect x="15" y="16" width="4" height="16" rx="1" fill="white"/><rect x="21" y="10" width="4" height="22" rx="1" fill="white"/><path d="M27 10L32 10L32 18M32 10L25 17" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="login-logo-brc">BRC</span>
+      <span class="login-logo-sub">Admin</span>
+    </div>
+    <div class="login-title">Acceso Administrativo</div>
+    <div class="login-sub">Panel de gestión de catálogo Boracell. Acceso restringido a personal autorizado.</div>
+    <form id="admin-form" novalidate>
+      <div class="fg">
+        <label class="fl">Nombre del administrador</label>
+        <input class="fi" type="text" id="a-name" placeholder="Nombre completo" autocomplete="name">
+        <div class="fe" id="ae-name">Campo requerido.</div>
+      </div>
+      <div class="fg">
+        <label class="fl">Código de acceso</label>
+        <input class="fi" type="password" id="a-code" placeholder="••••••••">
+        <div class="fe" id="ae-code">Código de acceso incorrecto.</div>
+      </div>
+      <div class="fg">
+        <label class="fl">Código de gerente</label>
+        <input class="fi" type="password" id="a-mgr" placeholder="••••••••">
+        <div class="fe" id="ae-mgr">Código de gerente incorrecto.</div>
+      </div>
+      <button type="submit" class="btn-submit">Ingresar al panel</button>
+    </form>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <div class="topbar">
+    <div class="tb-left">
+      <svg viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="4" fill="#cc1c1c"/><rect x="9" y="22" width="4" height="10" rx="1" fill="white"/><rect x="15" y="16" width="4" height="16" rx="1" fill="white"/><rect x="21" y="10" width="4" height="22" rx="1" fill="white"/><path d="M27 10L32 10L32 18M32 10L25 17" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="tb-title">BRC</span>
+      <span class="tb-sub">Gestión de catálogo</span>
+    </div>
+    <div class="tb-right">
+      <span class="tb-user">Admin: <span id="admin-name-display">—</span></span>
+      <a href="index.html" class="tb-back">← Ver catálogo cliente</a>
+      <button class="tb-logout" onclick="logout()">Cerrar sesión</button>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <div class="stats-row" id="stats-row"></div>
+
+    <div class="sec-hdr">
+      <div>
+        <div class="sec-hdr-title">Vehículos en catálogo</div>
+        <div class="sec-hdr-sub">Los cambios se reflejan en tiempo real en la página del cliente</div>
+      </div>
+      <button class="btn-add" onclick="openPanel(null)">+ Agregar vehículo</button>
+    </div>
+
+    <div class="search-bar">
+      <input class="search-input" type="text" id="search-input" placeholder="Buscar por nombre, año o precio..." oninput="filterList()">
+      <select class="filter-select" id="filter-status" onchange="filterList()">
+        <option value="all">Todos</option>
+        <option value="available">Con stock</option>
+        <option value="empty">Sin stock</option>
+      </select>
+    </div>
+
+    <div id="car-list-wrap"></div>
+
+  </div>
+</div>
+
+<!-- ADD/EDIT PANEL -->
+<div class="panel-overlay" id="panel-overlay" onclick="closePanel()"></div>
+<div class="panel" id="side-panel">
+  <div class="panel-header">
+    <div class="panel-title" id="panel-title">Agregar vehículo</div>
+    <button class="panel-close" onclick="closePanel()">✕</button>
+  </div>
+  <div class="panel-body">
+
+    <div class="pf-section">
+      <div class="pf-section-title">Información general</div>
+      <div class="pf-row">
+        <div>
+          <label class="pf-label">Nombre del modelo *</label>
+          <input class="pf-input" type="text" id="pf-name" placeholder="Ej. Serie 3 330i">
+          <div class="pf-err" id="pfe-name">Nombre requerido.</div>
+        </div>
+        <div>
+          <label class="pf-label">Año *</label>
+          <input class="pf-input" type="number" id="pf-year" placeholder="2024" min="1990" max="2030">
+          <div class="pf-err" id="pfe-year">Año requerido (1990–2030).</div>
+        </div>
+      </div>
+      <div class="pf-row full">
+        <div>
+          <label class="pf-label">Descripción</label>
+          <textarea class="pf-textarea" id="pf-desc" placeholder="Descripción visible en el catálogo..."></textarea>
+        </div>
+      </div>
+      <div class="pf-row">
+        <div>
+          <label class="pf-label">Precio compra (MXN) *</label>
+          <input class="pf-input" type="number" id="pf-price" placeholder="698000" min="0">
+          <div class="pf-err" id="pfe-price">Precio requerido.</div>
+        </div>
+        <div>
+          <label class="pf-label">Precio renta / día (MXN) *</label>
+          <input class="pf-input" type="number" id="pf-rent" placeholder="3500" min="0">
+          <div class="pf-err" id="pfe-rent">Precio de renta requerido.</div>
+        </div>
+      </div>
+      <div class="pf-row">
+        <div>
+          <label class="pf-label">Unidades disponibles *</label>
+          <input class="pf-input" type="number" id="pf-units" placeholder="0" min="0">
+          <div class="pf-err" id="pfe-units">Unidades requeridas.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pf-section">
+      <div class="pf-section-title">Imagen</div>
+      <div class="img-preview" id="img-preview"><div class="img-preview-ph">Vista previa</div></div>
+      <div>
+        <label class="pf-label">URL de imagen</label>
+        <input class="pf-input" type="url" id="pf-img" placeholder="https://..." oninput="previewImg()">
+      </div>
+    </div>
+
+    <div class="pf-section">
+      <div class="pf-section-title">Colores disponibles</div>
+      <div class="color-builder" id="color-builder"></div>
+      <button class="btn-add-row" onclick="addColor()">+ Agregar color</button>
+    </div>
+
+    <div class="pf-section">
+      <div class="pf-section-title">Especificaciones técnicas</div>
+      <div class="spec-builder" id="spec-builder"></div>
+      <button class="btn-add-row" onclick="addSpec()">+ Agregar especificación</button>
+    </div>
+
+  </div>
+  <div class="panel-footer">
+    <button class="btn-cancel" onclick="closePanel()">Cancelar</button>
+    <button class="btn-save" onclick="requestPublish()">Guardar y publicar →</button>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM -->
+<div class="modal-overlay" id="modal-del">
+  <div class="confirm-modal">
+    <div class="confirm-icon">🗑</div>
+    <div class="confirm-title">Eliminar vehículo</div>
+    <div class="confirm-msg" id="del-msg"></div>
+    <div class="confirm-actions">
+      <button class="btn-del-ok" onclick="confirmDelete()">Eliminar</button>
+      <button class="btn-del-cancel" onclick="closeDelModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- PUBLISH CODE -->
+<div class="modal-overlay" id="modal-publish">
+  <div class="publish-modal">
+    <div class="publish-title">Código de publicación</div>
+    <div class="publish-sub">Ingresa el código de publicación para confirmar y guardar el vehículo en el catálogo.</div>
+    <input class="publish-input" type="password" id="publish-code-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')submitPublish()">
+    <div class="publish-err" id="publish-err"></div>
+    <div class="publish-actions">
+      <button class="btn-pub-cancel" onclick="closePublishModal()">Cancelar</button>
+      <button class="btn-pub" onclick="submitPublish()">Publicar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <div class="toast-title" id="toast-title"></div>
+  <div class="toast-msg" id="toast-msg"></div>
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>

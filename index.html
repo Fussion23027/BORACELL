@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BORACELL — BMW</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,700;1,800&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ── */
+:root {
+  --bg:   #0d0d0d;
+  --bg1:  #111;
+  --bg2:  #181818;
+  --bg3:  #202020;
+  --bg4:  #2a2a2a;
+  --bdr:  rgba(255,255,255,0.07);
+  --bdrm: rgba(255,255,255,0.13);
+  --tx:   #f0f0f0;
+  --tx2:  #aaa;
+  --tx3:  #555;
+  --red:  #cc1c1c;
+  --red2: #e02020;
+  --red3: #ff4444;
+  --gold: #d4af37;
+  --grn:  #30d158;
+  --bad:  #ff453a;
+  --ylw:  #ffd60a;
+  --blu:  #1c69d4;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:'Inter',-apple-system,sans-serif;font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:var(--bg1)}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
+
+/* ══ LOGIN ══ */
+#login-screen{
+  position:fixed;inset:0;z-index:1000;
+  display:flex;align-items:stretch;
+  background:var(--bg);
+  transition:opacity .5s,visibility .5s;
+}
+#login-screen.hidden{opacity:0;visibility:hidden;pointer-events:none}
+
+.ls-left{
+  flex:1;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:52px;min-height:100vh;
+}
+.ls-car-bg{
+  position:absolute;inset:0;
+  background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/2019_BMW_M3_Competition_%28F80%2C_facelift%29%2C_front_8.27.19.jpg/1280px-2019_BMW_M3_Competition_%28F80%2C_facelift%29%2C_front_8.27.19.jpg');
+  background-size:cover;background-position:center 40%;
+  filter:brightness(.35) saturate(.6);
+}
+.ls-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(13,13,13,.7) 0%,rgba(13,13,13,.2) 60%,transparent 100%);
+}
+.ls-slash{
+  position:absolute;top:0;bottom:0;right:-40px;width:140px;
+  background:linear-gradient(180deg,var(--red) 0%,#7a0000 100%);
+  transform:skewX(-8deg);z-index:2;
+  box-shadow:-8px 0 40px rgba(204,28,28,.45);
+}
+.ls-logo{
+  position:absolute;top:40px;left:48px;z-index:4;
+  display:flex;align-items:center;gap:9px;
+}
+.ls-logo-icon{width:34px;height:34px}
+.ls-logo-text{font-size:13px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#fff}
+
+.ls-content{position:relative;z-index:3;margin-bottom:40px}
+.ls-brand-title{
+  font-family:'Inter',sans-serif;
+  font-size:clamp(54px,8vw,100px);
+  font-weight:800;font-style:italic;
+  color:#fff;line-height:.9;letter-spacing:-.02em;margin-bottom:14px;
+  text-shadow:0 4px 30px rgba(0,0,0,.6);
+}
+.ls-brand-sub{font-size:15px;font-weight:400;color:rgba(255,255,255,.55);line-height:1.55;max-width:320px}
+
+.ls-meta{
+  position:relative;z-index:3;
+  display:flex;gap:48px;
+}
+.ls-meta-label{font-size:10px;color:rgba(255,255,255,.35);letter-spacing:.12em;text-transform:uppercase;margin-bottom:3px}
+.ls-meta-val{font-size:14px;font-weight:700;color:#fff}
+
+/* Login form panel */
+.ls-right{
+  width:440px;flex-shrink:0;
+  background:var(--bg1);
+  display:flex;flex-direction:column;justify-content:center;
+  padding:56px 44px;
+  border-left:1px solid var(--bdr);
+  position:relative;z-index:5;
+}
+.ls-right-logo{display:flex;align-items:center;gap:9px;margin-bottom:36px}
+.ls-right-logo-icon{width:28px;height:28px}
+.ls-right-logo-text{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--tx2)}
+
+.ls-form-title{font-size:22px;font-weight:700;color:var(--tx);margin-bottom:6px}
+.ls-form-sub{font-size:13px;color:var(--tx3);margin-bottom:28px;line-height:1.55}
+
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);margin-bottom:6px}
+.form-input{
+  width:100%;background:var(--bg2);color:var(--tx);
+  border:1px solid var(--bdrm);border-radius:7px;
+  padding:11px 13px;font-family:inherit;font-size:13px;
+  outline:none;transition:border-color .15s;
+}
+.form-input:focus{border-color:var(--red)}
+.form-input::placeholder{color:var(--tx3)}
+.form-error{font-size:11px;color:var(--bad);margin-top:5px;display:none}
+.form-error.show{display:block}
+
+.privacy-box{
+  background:var(--bg2);border:1px solid var(--bdr);
+  border-radius:7px;padding:13px;margin-bottom:18px;
+}
+.privacy-check{display:flex;align-items:flex-start;gap:9px;cursor:pointer}
+.privacy-check input[type=checkbox]{margin-top:2px;accent-color:var(--red);width:14px;height:14px;flex-shrink:0;cursor:pointer}
+.privacy-check-label{font-size:12px;color:var(--tx2);line-height:1.55}
+.privacy-check-label a{color:var(--red);text-decoration:none}
+.privacy-check-label a:hover{text-decoration:underline}
+
+.btn-login{
+  width:100%;background:var(--red);color:#fff;border:none;
+  border-radius:7px;padding:13px;font-family:inherit;
+  font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;margin-bottom:16px;
+}
+.btn-login:hover{background:var(--red2)}
+
+.ls-divider{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.ls-divider-line{flex:1;height:1px;background:var(--bdr)}
+.ls-divider-text{font-size:11px;color:var(--tx3)}
+
+.ls-wallet-note{
+  background:rgba(204,28,28,.08);border:1px solid rgba(204,28,28,.2);
+  border-radius:7px;padding:12px 13px;font-size:12px;color:var(--tx2);line-height:1.6;
+}
+.ls-wallet-note strong{color:var(--red)}
+
+/* ══ APP ══ */
+#app{display:none}
+#app.visible{display:block}
+
+/* NAV */
+#nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:52px;
+  background:rgba(13,13,13,.92);
+  backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:1px solid var(--bdr);
+  display:flex;align-items:center;
+  justify-content:space-between;padding:0 40px;
+}
+.nav-logo-wrap{display:flex;align-items:center;gap:9px;cursor:pointer}
+.nav-logo-icon{width:26px;height:26px}
+.nav-logo-text{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--tx2)}
+.nav-links{display:flex;gap:28px;list-style:none}
+.nav-links a{font-size:12px;font-weight:400;color:var(--tx3);text-decoration:none;transition:color .15s}
+.nav-links a:hover{color:var(--tx)}
+.nav-right{display:flex;align-items:center;gap:8px}
+.lang-toggle{display:flex;align-items:center;border:1px solid var(--bdrm);border-radius:6px;overflow:hidden}
+.lang-btn{padding:4px 10px;font-family:inherit;font-size:11px;font-weight:500;text-transform:uppercase;cursor:pointer;border:none;background:none;color:var(--tx3);transition:all .15s}
+.lang-btn.active{background:var(--red);color:#fff}
+.lang-btn:hover:not(.active){color:var(--tx)}
+.lang-sep{width:1px;background:var(--bdrm);height:14px}
+.wallet-pill{display:flex;align-items:center;gap:7px;background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:5px 13px;cursor:pointer;transition:border-color .15s}
+.wallet-pill:hover{border-color:var(--bdrm)}
+.wp-label{font-size:9px;letter-spacing:.14em;color:var(--tx3);text-transform:uppercase}
+.wp-amt{font-size:13px;font-weight:600;color:var(--tx)}
+.btn-cart{background:var(--red);color:#fff;border:none;border-radius:8px;padding:6px 14px;font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .15s}
+.btn-cart:hover{background:var(--red2)}
+.cart-badge{background:rgba(255,255,255,.2);color:#fff;font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+
+/* HERO */
+#hero{
+  margin-top:52px;position:relative;overflow:hidden;
+  min-height:90vh;display:flex;align-items:flex-end;padding-bottom:80px;
+}
+.hero-car-bg{
+  position:absolute;inset:0;
+  background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/2019_BMW_M3_Competition_%28F80%2C_facelift%29%2C_front_8.27.19.jpg/1280px-2019_BMW_M3_Competition_%28F80%2C_facelift%29%2C_front_8.27.19.jpg');
+  background-size:cover;background-position:center 40%;
+  filter:brightness(.32) saturate(.6);
+}
+.hero-grad{
+  position:absolute;inset:0;
+  background:linear-gradient(to right,rgba(13,13,13,.9) 0%,rgba(13,13,13,.5) 55%,rgba(13,13,13,.1) 100%);
+}
+.hero-slash{
+  position:absolute;top:0;bottom:0;right:8%;width:200px;
+  background:linear-gradient(180deg,#cc1c1c 0%,#7a0000 100%);
+  transform:skewX(-8deg);z-index:2;opacity:.85;
+  box-shadow:-10px 0 60px rgba(204,28,28,.4);
+}
+.hero-content{position:relative;z-index:3;padding:0 80px;max-width:680px}
+.hero-eyebrow{font-size:11px;font-weight:500;letter-spacing:.24em;color:var(--red3);text-transform:uppercase;margin-bottom:18px}
+.hero-title{
+  font-family:'Inter',sans-serif;font-size:clamp(60px,9vw,118px);
+  font-weight:800;font-style:italic;color:#fff;
+  line-height:.88;letter-spacing:-.02em;margin-bottom:20px;
+  text-shadow:0 6px 40px rgba(0,0,0,.7);
+}
+.hero-sub{font-size:16px;color:rgba(255,255,255,.5);font-weight:300;line-height:1.6;max-width:380px;margin-bottom:32px}
+.hero-meta{display:flex;gap:48px;margin-bottom:32px}
+.hm-label{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.32);margin-bottom:3px}
+.hm-val{font-size:14px;font-weight:700;color:#fff}
+.hero-actions{display:flex;gap:12px}
+.btn-hp{background:var(--red);color:#fff;border:none;border-radius:4px;padding:13px 30px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s}
+.btn-hp:hover{background:var(--red2)}
+.btn-hg{background:rgba(255,255,255,.07);color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:4px;padding:13px 30px;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s}
+.btn-hg:hover{background:rgba(255,255,255,.12)}
+
+/* TICKER */
+.ticker{background:var(--red);overflow:hidden;padding:9px 0}
+.ticker-track{display:flex;gap:52px;animation:tick 30s linear infinite;white-space:nowrap}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ticker-item{font-size:11px;font-weight:500;letter-spacing:.1em;color:rgba(255,255,255,.85);flex-shrink:0}
+
+/* BRAND BAR */
+.brand-bar{background:var(--bg1);border-bottom:1px solid var(--bdr);padding:20px 80px;display:flex;align-items:center;gap:20px}
+.brand-bar-label{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--tx3);white-space:nowrap}
+.brand-list{display:flex;align-items:center}
+.brand-chip{display:flex;align-items:center;gap:10px;padding:10px 28px;cursor:pointer;border:1px solid var(--bdr);border-right:none;transition:all .15s}
+.brand-chip:last-child{border-right:1px solid var(--bdr)}
+.brand-chip:hover:not(.active){background:var(--bg2)}
+.brand-chip.active{background:var(--bg2);border-color:var(--bdrm);position:relative}
+.brand-chip.active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:var(--red)}
+.bmw-roundel{width:36px;height:36px;flex-shrink:0}
+.brand-chip-name{font-size:13px;font-weight:600;color:var(--tx)}
+
+/* SECTIONS */
+.section{padding:80px}
+.section-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:40px;padding-bottom:16px;border-bottom:1px solid var(--bdr)}
+.sec-eye{font-size:11px;letter-spacing:.22em;color:var(--red);text-transform:uppercase;margin-bottom:6px;font-weight:500}
+.sec-ttl{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,3vw,46px);letter-spacing:.06em;color:var(--tx);line-height:1}
+
+/* VEHICLE CARDS */
+.v-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--bdr);border:1px solid var(--bdr);border-radius:12px;overflow:hidden}
+.v-card{background:var(--bg1);display:flex;flex-direction:column;transition:background .2s}
+.v-card:hover{background:var(--bg2)}
+.v-card:hover .v-img{transform:scale(1.04)}
+.v-img-wrap{height:210px;overflow:hidden;position:relative;background:var(--bg2)}
+.v-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease;filter:brightness(.8)}
+.v-img-fb{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--bg4)}
+.v-avail{position:absolute;top:12px;left:12px;font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:3px 9px;border-radius:20px}
+.avail-y{background:rgba(48,209,88,.12);color:var(--grn);border:1px solid rgba(48,209,88,.25)}
+.avail-n{background:rgba(255,69,58,.12);color:var(--bad);border:1px solid rgba(255,69,58,.25)}
+.v-accent{height:2px;background:linear-gradient(90deg,var(--red) 0%,transparent 100%)}
+.v-body{padding:20px 22px 22px;flex:1;display:flex;flex-direction:column}
+.v-brand{font-size:10px;font-weight:500;letter-spacing:.16em;color:var(--tx3);text-transform:uppercase;margin-bottom:4px}
+.v-name{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.06em;color:var(--tx);line-height:1;margin-bottom:4px}
+.v-engine{font-size:12px;color:var(--tx3);margin-bottom:16px}
+.v-colors{display:flex;align-items:center;gap:6px;margin-bottom:16px}
+.v-clabel{font-size:10px;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase;margin-right:4px}
+.vcdot{width:14px;height:14px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:border-color .15s}
+.vcdot:hover,.vcdot.on{border-color:rgba(255,255,255,.6)}
+.v-divider{border:none;border-top:1px solid var(--bdr);margin:0 0 16px}
+.v-prices{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px}
+.vp-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);margin-bottom:2px}
+.vp-main{font-size:18px;font-weight:700;color:var(--tx);line-height:1}
+.vp-usd{font-size:11px;color:var(--tx3);margin-top:2px}
+.vp-rent{font-size:14px;font-weight:600;color:var(--tx2)}
+.vp-rent-usd{font-size:11px;color:var(--tx3);margin-top:2px}
+.v-actions{display:flex;gap:8px;margin-top:auto}
+.v-btn-buy{flex:1;background:var(--red);color:#fff;border:none;border-radius:7px;padding:10px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s}
+.v-btn-buy:hover{background:var(--red2)}
+.v-btn-buy:disabled{background:var(--bg4);color:var(--tx3);cursor:not-allowed}
+.v-btn-rent{flex:1;background:var(--bg3);color:var(--tx);border:1px solid var(--bdrm);border-radius:7px;padding:10px;font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}
+.v-btn-rent:hover{background:var(--bg4)}
+.v-btn-rent:disabled{color:var(--tx3);cursor:not-allowed}
+.v-btn-detail{background:var(--bg3);color:var(--tx2);border:1px solid var(--bdr);border-radius:7px;padding:10px 13px;font-family:inherit;font-size:12px;cursor:pointer;transition:all .15s}
+.v-btn-detail:hover{background:var(--bg4);color:var(--tx)}
+
+/* FACTORY */
+.factory-wrap{background:var(--bg1)}
+.factory-header-bar{background:linear-gradient(90deg,#1a0000 0%,var(--bg1) 100%);border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr);padding:14px 80px;display:flex;align-items:center;gap:16px}
+.fhb-tag{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-weight:600;white-space:nowrap}
+.fhb-desc{font-size:12px;color:var(--tx3)}
+.fac-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--bdr);border:1px solid var(--bdr);border-radius:12px;overflow:hidden}
+.fac-card{background:var(--bg1);cursor:pointer;transition:background .2s}
+.fac-card:hover{background:var(--bg2)}
+.fac-card:hover .fac-img{transform:scale(1.04)}
+.fac-img-wrap{height:200px;overflow:hidden;position:relative;background:var(--bg2)}
+.fac-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease;filter:brightness(.75)}
+.fac-fb{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--bg4)}
+.fac-bar{height:2px;background:linear-gradient(90deg,var(--red) 0%,var(--gold) 100%)}
+.fac-body{padding:18px 20px 22px}
+.fac-tag-pill{display:inline-block;font-size:9px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;background:rgba(212,175,55,.1);color:var(--gold);border:1px solid rgba(212,175,55,.2);padding:3px 9px;border-radius:20px;margin-bottom:10px}
+.fac-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.06em;color:var(--tx);margin-bottom:2px}
+.fac-engine{font-size:11px;color:var(--tx3);margin-bottom:14px}
+.fac-specs-mini{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin-bottom:14px}
+.fsm-k{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3)}
+.fsm-v{font-size:12px;font-weight:600;color:var(--tx2);margin-top:1px}
+.fac-footer{display:flex;justify-content:space-between;align-items:flex-end;padding-top:12px;border-top:1px solid var(--bdr)}
+.fac-pl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3)}
+.fac-pv{font-size:17px;font-weight:700;color:var(--tx)}
+.fac-pv-usd{font-size:11px;color:var(--tx3)}
+.fac-units{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em}
+.fu-y{color:var(--grn)} .fu-n{color:var(--bad)}
+
+/* PROMOS */
+.promos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--bdr);border:1px solid var(--bdr);border-radius:12px;overflow:hidden}
+.promo-card{background:var(--bg1);padding:32px 28px;transition:background .2s}
+.promo-card:hover{background:var(--bg2)}
+.promo-bar{height:2px;width:28px;margin-bottom:18px}
+.pb-r{background:var(--red)} .pb-g{background:var(--gold)} .pb-gn{background:var(--grn)}
+.promo-eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--tx3);margin-bottom:8px}
+.promo-card h3{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.06em;color:var(--tx);margin-bottom:8px;line-height:1.1}
+.promo-card p{font-size:12px;color:var(--tx2);line-height:1.7;margin-bottom:18px}
+.promo-value{font-family:'Bebas Neue',sans-serif;font-size:48px;line-height:1;color:var(--tx);margin-bottom:4px}
+.promo-until{font-size:10px;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase}
+
+/* MECHANICS */
+.mech-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--bdr);border:1px solid var(--bdr);border-radius:12px;overflow:hidden}
+.mech-card{background:var(--bg1);padding:30px 26px;transition:background .2s}
+.mech-card:hover{background:var(--bg2)}
+.mech-num{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--bg4);line-height:1;margin-bottom:10px}
+.mech-card h3{font-size:13px;font-weight:600;color:var(--tx);margin-bottom:8px}
+.mech-card p{font-size:12px;color:var(--tx2);line-height:1.75;margin-bottom:12px}
+.mech-price{font-size:13px;font-weight:600;color:var(--red3)}
+
+/* FOOTER */
+footer{background:var(--bg1);padding:56px 80px 28px;border-top:1px solid var(--bdr)}
+.footer-top{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:52px;padding-bottom:44px;border-bottom:1px solid var(--bdr);margin-bottom:24px}
+.f-logo-wrap{display:flex;align-items:center;gap:9px;margin-bottom:12px}
+.f-logo-icon{width:24px;height:24px}
+.f-logo-text{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--tx2)}
+.f-tagline{font-size:12px;color:var(--tx3);line-height:1.8;max-width:220px}
+.f-col h4{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--tx2);font-weight:600;margin-bottom:14px}
+.f-col ul{list-style:none}
+.f-col ul li{margin-bottom:7px}
+.f-col ul li a{font-size:12px;color:var(--tx3);text-decoration:none;transition:color .15s}
+.f-col ul li a:hover{color:var(--tx2)}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between}
+.f-copy{font-size:11px;color:var(--tx3)}
+.f-legal{display:flex;gap:16px}
+.f-legal a{font-size:11px;color:var(--tx3);text-decoration:none}
+.f-legal a:hover{color:var(--tx2)}
+
+/* OVERLAYS & MODALS */
+.overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px)}
+.overlay.open{display:flex}
+
+/* Vehicle modal */
+.v-modal{background:var(--bg2);width:100%;max-width:840px;max-height:92vh;overflow-y:auto;border:1px solid var(--bdrm);border-radius:16px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.8)}
+.modal-close{position:absolute;top:14px;right:14px;z-index:2;width:28px;height:28px;background:var(--bg4);border:none;border-radius:50%;cursor:pointer;font-size:13px;color:var(--tx2);display:flex;align-items:center;justify-content:center;transition:all .15s}
+.modal-close:hover{background:rgba(255,255,255,.12);color:var(--tx)}
+.m-layout{display:grid;grid-template-columns:1fr 1fr}
+.m-photo{min-height:380px;overflow:hidden;background:var(--bg3);border-radius:16px 0 0 16px;display:flex;align-items:center;justify-content:center}
+.m-photo img{width:100%;height:100%;object-fit:cover;display:block;border-radius:16px 0 0 16px;filter:brightness(.75)}
+.m-photo-fb{font-family:'Bebas Neue',sans-serif;font-size:60px;color:var(--bg4)}
+.m-content{padding:32px 28px;overflow-y:auto;max-height:92vh}
+.m-eyebrow{font-size:10px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--red3);margin-bottom:4px}
+.m-title{font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:.06em;line-height:1;color:var(--tx);margin-bottom:2px}
+.m-subtitle{font-size:12px;color:var(--tx3);margin-bottom:22px}
+.m-specs-title{font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--tx3);margin-bottom:8px}
+.m-spec{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bdr);font-size:13px}
+.m-spec-k{color:var(--tx3)} .m-spec-v{color:var(--tx);font-weight:500}
+.m-color-title{font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--tx3);margin:18px 0 10px}
+.m-colors{display:flex;gap:8px;flex-wrap:wrap}
+.mc-opt{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+.mc-sw{width:24px;height:24px;border-radius:50%;border:2px solid transparent;transition:border-color .15s}
+.mc-sw:hover,.mc-sw.sel{border-color:rgba(255,255,255,.7)}
+.mc-nm{font-size:9px;color:var(--tx3);max-width:52px;text-align:center;line-height:1.2}
+.m-price-section{display:flex;justify-content:space-between;align-items:flex-start;padding:16px 0;border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr);margin:18px 0}
+.mprice-label{font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--tx3);margin-bottom:3px}
+.mprice-buy{font-size:24px;font-weight:700;color:var(--tx);line-height:1}
+.mprice-buy-usd{font-size:12px;color:var(--tx3);margin-top:2px}
+.mprice-rent{font-size:16px;font-weight:600;color:var(--tx2);text-align:right}
+.mprice-rent-usd{font-size:12px;color:var(--tx3);text-align:right;margin-top:2px}
+.m-actions{display:flex;gap:8px}
+.ma-buy{flex:1;background:var(--red);color:#fff;border:none;border-radius:7px;padding:12px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s}
+.ma-buy:hover{background:var(--red2)}
+.ma-buy:disabled{background:var(--bg4);color:var(--tx3);cursor:not-allowed}
+.ma-rent{flex:1;background:var(--bg3);color:var(--tx);border:1px solid var(--bdrm);border-radius:7px;padding:12px;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s}
+.ma-rent:hover{background:var(--bg4)}
+.ma-rent:disabled{color:var(--tx3);cursor:not-allowed}
+.m-units{margin-top:10px;font-size:11px;letter-spacing:.08em}
+.unit-ok{color:var(--grn)} .unit-no{color:var(--bad)}
+
+/* Cart */
+.cart-box{background:var(--bg2);width:100%;max-width:580px;max-height:92vh;overflow-y:auto;border:1px solid var(--bdrm);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.8)}
+.cart-head{padding:20px 24px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg2);border-radius:16px 16px 0 0;z-index:2}
+.cart-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.08em;color:var(--tx)}
+.cart-items{padding:20px 24px}
+.cart-empty{text-align:center;padding:48px 0;font-size:12px;color:var(--tx3);letter-spacing:.12em;text-transform:uppercase}
+.cart-row{display:flex;justify-content:space-between;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--bdr);gap:12px}
+.cr-name{font-size:14px;font-weight:600;color:var(--tx);margin-bottom:2px}
+.cr-detail{font-size:11px;color:var(--tx3)}
+.cr-arrival{font-size:11px;color:var(--tx2);margin-top:4px}
+.cr-badge{display:inline-block;margin-top:5px;font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border-radius:20px}
+.crb-buy{background:rgba(204,28,28,.12);color:var(--red3);border:1px solid rgba(204,28,28,.25)}
+.crb-rent{background:rgba(212,175,55,.1);color:var(--gold);border:1px solid rgba(212,175,55,.2)}
+.cr-right{text-align:right;flex-shrink:0}
+.cr-price{font-size:15px;font-weight:700;color:var(--tx)}
+.cr-price-usd{font-size:11px;color:var(--tx3);margin-top:1px}
+.cr-remove{font-size:10px;color:var(--bad);cursor:pointer;background:none;border:none;font-family:inherit;margin-top:4px;display:block}
+.cart-summary{padding:18px 24px;border-top:1px solid var(--bdr)}
+.cs-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.cs-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--tx3)}
+.cs-total{font-size:26px;font-weight:700;color:var(--tx)}
+.cs-total-usd{font-size:12px;color:var(--tx3);text-align:right;margin-top:2px}
+.cs-wallet{font-size:14px;font-weight:600;color:var(--tx2)}
+.wallet-status{padding:10px 14px;font-size:12px;margin:12px 0;border-radius:8px}
+.ws-ok{background:rgba(48,209,88,.08);border:1px solid rgba(48,209,88,.2);color:var(--grn)}
+.ws-fail{background:rgba(255,69,58,.08);border:1px solid rgba(255,69,58,.2);color:var(--bad)}
+.btn-confirm{width:100%;background:var(--red);color:#fff;border:none;border-radius:7px;padding:13px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;margin-bottom:8px}
+.btn-confirm:hover{background:var(--red2)}
+.btn-confirm:disabled{background:var(--bg4);color:var(--tx3);cursor:not-allowed}
+
+/* Order panel */
+.order-panel{background:var(--bg2);width:100%;max-width:620px;max-height:92vh;overflow-y:auto;border:1px solid var(--bdrm);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.8)}
+.op-header{padding:22px 26px 18px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg2);border-radius:16px 16px 0 0;z-index:2}
+.op-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.08em;color:var(--tx)}
+.op-body{padding:24px 26px}
+.op-status-bar{display:flex;align-items:center;margin-bottom:28px;padding:16px 20px;background:var(--bg3);border-radius:10px;border:1px solid var(--bdr)}
+.op-step{display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
+.op-step:not(:last-child)::after{content:'';position:absolute;top:12px;left:calc(50% + 14px);right:calc(-50% + 14px);height:1px;background:var(--bdr)}
+.op-step.done::after{background:var(--grn)}
+.op-dot{width:24px;height:24px;border-radius:50%;background:var(--bg4);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--tx3);margin-bottom:6px}
+.op-step.done .op-dot{background:var(--grn);border-color:var(--grn);color:#000;font-weight:700}
+.op-step.active .op-dot{background:var(--red);border-color:var(--red);color:#fff;font-weight:700}
+.op-step-label{font-size:10px;color:var(--tx3);letter-spacing:.06em;text-align:center}
+.op-step.done .op-step-label,.op-step.active .op-step-label{color:var(--tx2)}
+.op-section{margin-bottom:22px}
+.op-section-title{font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--tx3);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--bdr)}
+.op-row{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.03);font-size:13px}
+.op-row:last-child{border-bottom:none}
+.op-key{color:var(--tx3)}
+.op-val{color:var(--tx);font-weight:500;text-align:right;max-width:55%}
+.op-val.gn{color:var(--grn)} .op-val.yl{color:var(--ylw)} .op-val.rv{color:var(--red3)} .op-val.bl{color:#60aaff}
+.op-policy{background:var(--bg3);border:1px solid var(--bdr);border-radius:10px;padding:14px 16px;margin-bottom:20px}
+.op-policy-title{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--tx3);margin-bottom:8px}
+.op-policy p{font-size:12px;color:var(--tx2);line-height:1.65}
+.op-actions{display:flex;gap:10px;margin-top:4px}
+.op-btn-cancel{flex:1;background:rgba(255,69,58,.1);color:var(--bad);border:1px solid rgba(255,69,58,.25);border-radius:7px;padding:11px;font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}
+.op-btn-cancel:hover{background:rgba(255,69,58,.18)}
+.op-btn-cancel:disabled{opacity:.35;cursor:not-allowed}
+.op-btn-close{flex:1;background:var(--bg3);color:var(--tx2);border:1px solid var(--bdrm);border-radius:7px;padding:11px;font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}
+.op-btn-close:hover{background:var(--bg4);color:var(--tx)}
+
+/* Toast */
+.toast{position:fixed;bottom:22px;right:22px;z-index:600;background:var(--bg3);color:var(--tx);border:1px solid var(--bdrm);padding:14px 18px;max-width:300px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.5);transform:translateY(12px);opacity:0;pointer-events:none;transition:all .25s}
+.toast.show{transform:translateY(0);opacity:1}
+.toast-title{font-size:12px;font-weight:600;color:var(--tx);margin-bottom:3px}
+.toast-msg{font-size:12px;color:var(--tx3);line-height:1.5}
+
+@media(max-width:960px){
+  #nav{padding:0 20px}
+  .nav-links{display:none}
+  .section,.factory-header-bar,footer,.brand-bar{padding-left:24px;padding-right:24px}
+  .v-grid,.fac-grid,.promos-grid,.mech-grid{grid-template-columns:1fr}
+  .footer-top{grid-template-columns:1fr 1fr;gap:24px}
+  .m-layout{grid-template-columns:1fr}
+  .m-photo{min-height:200px;border-radius:16px 16px 0 0}
+  .m-photo img{border-radius:16px 16px 0 0}
+  .ls-left{display:none}
+  .ls-right{width:100%;border-left:none}
+  #hero{min-height:75vh}
+  .hero-content{padding:0 28px}
+  .hero-slash{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ LOGIN ═══════════ -->
+<div id="login-screen">
+  <div class="ls-left">
+    <div class="ls-car-bg"></div>
+    <div class="ls-overlay"></div>
+    <div class="ls-slash"></div>
+    <div class="ls-logo">
+      <svg class="ls-logo-icon" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="4" fill="#cc1c1c"/><rect x="9" y="22" width="4" height="10" rx="1" fill="white"/><rect x="15" y="16" width="4" height="16" rx="1" fill="white"/><rect x="21" y="10" width="4" height="22" rx="1" fill="white"/><path d="M27 10 L32 10 L32 18 M32 10 L25 17" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="ls-logo-text">Borcelle</span>
+    </div>
+    <div class="ls-content">
+      <div class="ls-brand-title">BORACELL</div>
+      <div class="ls-brand-sub">Gestión de servicios y control de ventas automotrices</div>
+    </div>
+    <div class="ls-meta">
+      <div><div class="ls-meta-label">Presented by</div><div class="ls-meta-val">Equipo 10</div></div>
+      <div><div class="ls-meta-label">Date</div><div class="ls-meta-val">July 21st, 2029</div></div>
+    </div>
+  </div>
+
+  <div class="ls-right">
+    <div class="ls-right-logo">
+      <svg class="ls-right-logo-icon" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="4" fill="#cc1c1c"/><rect x="9" y="22" width="4" height="10" rx="1" fill="white"/><rect x="15" y="16" width="4" height="16" rx="1" fill="white"/><rect x="21" y="10" width="4" height="22" rx="1" fill="white"/><path d="M27 10 L32 10 L32 18 M32 10 L25 17" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="ls-right-logo-text">Borcelle</span>
+    </div>
+    <div class="ls-form-title">Acceder a Boracell</div>
+    <div class="ls-form-sub">Ingresa tus datos para acceder al catálogo y gestionar tu cuenta.</div>
+    <form id="login-form" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="login-name">Nombre completo</label>
+        <input class="form-input" type="text" id="login-name" placeholder="Ej. Carlos Mendoza" autocomplete="name">
+        <div class="form-error" id="err-name">Por favor ingresa tu nombre completo.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="login-email">Correo electrónico</label>
+        <input class="form-input" type="email" id="login-email" placeholder="correo@ejemplo.com" autocomplete="email">
+        <div class="form-error" id="err-email">Ingresa un correo electrónico válido.</div>
+      </div>
+      <div class="privacy-box">
+        <label class="privacy-check">
+          <input type="checkbox" id="login-privacy">
+          <span class="privacy-check-label">He leído y acepto el <a href="#" onclick="return false">Aviso de Privacidad</a> y los <a href="#" onclick="return false">Términos y Condiciones</a> de Boracell. Datos tratados conforme a la LFPDPPP.</span>
+        </label>
+        <div class="form-error" id="err-privacy" style="margin-top:8px">Debes aceptar el aviso de privacidad para continuar.</div>
+      </div>
+      <button type="submit" class="btn-login">Ingresar al catálogo</button>
+      <div class="ls-divider"><div class="ls-divider-line"></div><span class="ls-divider-text">Nuevo cliente</span><div class="ls-divider-line"></div></div>
+      <div class="ls-wallet-note">Al registrarte recibirás automáticamente una <strong>cartera virtual de $950,000 MXN</strong> para compras y rentas en la plataforma.</div>
+    </form>
+  </div>
+</div>
+
+<!-- ═══════════ APP ═══════════ -->
+<div id="app">
+
+<nav id="nav">
+  <div class="nav-logo-wrap" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <svg class="nav-logo-icon" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="4" fill="#cc1c1c"/><rect x="9" y="22" width="4" height="10" rx="1" fill="white"/><rect x="15" y="16" width="4" height="16" rx="1" fill="white"/><rect x="21" y="10" width="4" height="22" rx="1" fill="white"/><path d="M27 10 L32 10 L32 18 M32 10 L25 17" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="nav-logo-text">Borcelle</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#cars"      data-es="Autos"    data-en="Cars">Autos</a></li>
+    <li><a href="#factory"   data-es="Fábrica"  data-en="Factory">Fábrica</a></li>
+    <li><a href="#mechanics" data-es="Mecánica" data-en="Mechanics">Mecánica</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="btn-es" onclick="setLang('es')">ES</button>
+      <div class="lang-sep"></div>
+      <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+    </div>
+    <div class="wallet-pill" onclick="openCart()">
+      <span class="wp-label" data-es="Cartera" data-en="Wallet">Cartera</span>
+      <span class="wp-amt" id="wallet-display">$950,000 MXN</span>
+    </div>
+    <button class="btn-cart" onclick="openCart()">
+      <span data-es="Carrito" data-en="Cart">Carrito</span>
+      <span class="cart-badge" id="cart-count">0</span>
+    </button>
+  </div>
+</nav>
+
+<section id="hero">
+  <div class="hero-car-bg"></div>
+  <div class="hero-grad"></div>
+  <div class="hero-slash"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow" data-es="Distribuidor Certificado BMW — México" data-en="Certified BMW Dealer — Mexico">Distribuidor Certificado BMW — México</div>
+    <h1 class="hero-title">BORACELL</h1>
+    <p class="hero-sub" data-es="Gestión de servicios y control de ventas automotrices. Compra, renta y servicio certificado BMW." data-en="Automotive sales management and service control. Purchase, rental and certified BMW service.">Gestión de servicios y control de ventas automotrices. Compra, renta y servicio certificado BMW.</p>
+    <div class="hero-meta">
+      <div><div class="hm-label" data-es="Presentado por" data-en="Presented by">Presentado por</div><div class="hm-val">Equipo 10</div></div>
+      <div><div class="hm-label">BMW · México</div><div class="hm-val" data-es="Región Noreste" data-en="Northeast Region">Región Noreste</div></div>
+    </div>
+    <div class="hero-actions">
+      <button class="btn-hp" onclick="document.getElementById('cars').scrollIntoView({behavior:'smooth'})" data-es="Ver Catálogo" data-en="View Catalog">Ver Catálogo</button>
+      <button class="btn-hg" onclick="document.getElementById('factory').scrollIntoView({behavior:'smooth'})" data-es="Fábrica" data-en="Factory">Fábrica</button>
+    </div>
+  </div>
+</section>
+
+<div class="ticker"><div class="ticker-track" id="ticker-track"></div></div>
+
+<div class="brand-bar">
+  <span class="brand-bar-label" data-es="Marcas" data-en="Brands">Marcas</span>
+  <div class="brand-list">
+    <div class="brand-chip active">
+      <svg class="bmw-roundel" viewBox="0 0 72 72" fill="none">
+        <circle cx="36" cy="36" r="35.5" fill="#111" stroke="#333" stroke-width=".5"/>
+        <circle cx="36" cy="36" r="30" fill="white"/>
+        <path d="M36 36 L36 7 A29 29 0 0 0 7 36 Z" fill="white"/>
+        <path d="M36 36 L65 36 A29 29 0 0 0 36 7 Z" fill="#1c69d4"/>
+        <path d="M36 36 L36 65 A29 29 0 0 0 65 36 Z" fill="white"/>
+        <path d="M36 36 L7 36 A29 29 0 0 0 36 65 Z" fill="#1c69d4"/>
+        <circle cx="36" cy="36" r="29" fill="none" stroke="white" stroke-width="1.5"/>
+        <circle cx="36" cy="36" r="30.5" fill="none" stroke="white" stroke-width="1"/>
+        <text x="36" y="13" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="7.5" font-weight="800" fill="white" letter-spacing="1.8">BMW</text>
+      </svg>
+      <span class="brand-chip-name">BMW</span>
+    </div>
+  </div>
+</div>
+
+<section class="section" id="cars">
+  <div class="section-header">
+    <div><div class="sec-eye" data-es="Catálogo 2024" data-en="2024 Catalog">Catálogo 2024</div><h2 class="sec-ttl" data-es="Vehículos BMW" data-en="BMW Vehicles">Vehículos BMW</h2></div>
+  </div>
+  <div class="v-grid" id="v-grid"></div>
+</section>
+
+<div class="factory-wrap" id="factory">
+  <div class="factory-header-bar">
+    <span class="fhb-tag" data-es="Producción Boracell" data-en="Boracell Production">Producción Boracell</span>
+    <span class="fhb-desc" data-es="Modelos fabricados en nuestra planta con disponibilidad garantizada y entrega prioritaria." data-en="Models manufactured at our plant with guaranteed availability and priority delivery.">Modelos fabricados en nuestra planta con disponibilidad garantizada y entrega prioritaria.</span>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div><div class="sec-eye" data-es="Fabricación Propia" data-en="In-House Manufacturing">Fabricación Propia</div><h2 class="sec-ttl">Factory</h2></div>
+    </div>
+    <div class="fac-grid" id="fac-grid"></div>
+  </div>
+</div>
+
+<section class="section" id="promos" style="background:var(--bg1)">
+  <div class="section-header">
+    <div><div class="sec-eye" data-es="Ofertas Especiales" data-en="Special Offers">Ofertas Especiales</div><h2 class="sec-ttl" data-es="Promociones" data-en="Promotions">Promociones</h2></div>
+  </div>
+  <div class="promos-grid">
+    <div class="promo-card">
+      <div class="promo-bar pb-r"></div>
+      <div class="promo-eyebrow" data-es="Compra" data-en="Purchase">Compra</div>
+      <h3 data-es="Serie 3 — Precio de Temporada" data-en="Series 3 — Seasonal Price">Serie 3 — Precio de Temporada</h3>
+      <p data-es="Adquiere el BMW Serie 3 2024 con descuento exclusivo. Incluye mantenimiento 2 años y seguro a todo riesgo." data-en="Get the BMW Series 3 2024 at an exclusive discount. Includes 2-year maintenance and full coverage.">Adquiere el BMW Serie 3 2024 con descuento exclusivo. Incluye mantenimiento 2 años y seguro a todo riesgo.</p>
+      <div class="promo-value">-8%</div>
+      <div class="promo-until" data-es="Válido hasta 31 dic 2025" data-en="Valid until Dec 31 2025">Válido hasta 31 dic 2025</div>
+    </div>
+    <div class="promo-card">
+      <div class="promo-bar pb-g"></div>
+      <div class="promo-eyebrow" data-es="Renta" data-en="Rental">Renta</div>
+      <h3 data-es="Renta Semanal Reducida" data-en="Reduced Weekly Rental">Renta Semanal Reducida</h3>
+      <p data-es="Renta cualquier modelo Serie M por 7 días con tarifa reducida. Kilometraje ilimitado incluido." data-en="Rent any M Series model for 7 days at a reduced rate. Unlimited mileage included.">Renta cualquier modelo Serie M por 7 días con tarifa reducida. Kilometraje ilimitado incluido.</p>
+      <div class="promo-value">-15%</div>
+      <div class="promo-until" data-es="Solo modelos Serie M" data-en="M Series models only">Solo modelos Serie M</div>
+    </div>
+    <div class="promo-card">
+      <div class="promo-bar pb-gn"></div>
+      <div class="promo-eyebrow" data-es="Cartera" data-en="Wallet">Cartera</div>
+      <h3 data-es="Saldo de Bienvenida" data-en="Welcome Balance">Saldo de Bienvenida</h3>
+      <p data-es="Clientes nuevos reciben saldo automático en su cartera virtual, aplicable en cualquier compra o renta." data-en="New clients automatically receive a virtual wallet balance for any purchase or rental.">Clientes nuevos reciben saldo automático en su cartera virtual, aplicable en cualquier compra o renta.</p>
+      <div class="promo-value">$950K</div>
+      <div class="promo-until" data-es="Al registrarse" data-en="Upon registration">Al registrarse</div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="mechanics" style="background:var(--bg2)">
+  <div class="section-header">
+    <div><div class="sec-eye" data-es="Servicio Certificado" data-en="Certified Service">Servicio Certificado</div><h2 class="sec-ttl" data-es="Mecánica" data-en="Mechanics">Mecánica</h2></div>
+  </div>
+  <div class="mech-grid">
+    <div class="mech-card"><div class="mech-num">01</div><h3 data-es="Mantenimiento Preventivo" data-en="Preventive Maintenance">Mantenimiento Preventivo</h3><p data-es="Cambio de aceite, revisión de frenos, filtros, líquidos y diagnóstico completo. Técnicos certificados BMW Group." data-en="Oil change, brake inspection, filters, fluids and complete diagnostics. BMW Group certified technicians.">Cambio de aceite, revisión de frenos, filtros, líquidos y diagnóstico completo. Técnicos certificados BMW Group.</p><div class="mech-price">Desde $2,800 MXN</div></div>
+    <div class="mech-card"><div class="mech-num">02</div><h3 data-es="Diagnóstico Electrónico" data-en="Electronic Diagnostics">Diagnóstico Electrónico</h3><p data-es="Escaneo del sistema iDrive, módulos de control, suspensión activa y tren motriz. Reportes digitales." data-en="iDrive system scan, control modules, active suspension and drivetrain. Digital reports.">Escaneo del sistema iDrive, módulos de control, suspensión activa y tren motriz. Reportes digitales.</p><div class="mech-price">Desde $800 MXN</div></div>
+    <div class="mech-card"><div class="mech-num">03</div><h3>Bodywork & Detailing</h3><p data-es="Restauración de pintura, pulido de faros, limpieza profunda de interiores y protección cerámica M Performance." data-en="Paint restoration, headlight polishing, deep interior cleaning and M Performance ceramic coating.">Restauración de pintura, pulido de faros, limpieza profunda de interiores y protección cerámica M Performance.</p><div class="mech-price">Desde $3,500 MXN</div></div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="f-logo-wrap">
+        <svg class="f-logo-icon" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="4" fill="#cc1c1c"/><rect x="9" y="22" width="4" height="10" rx="1" fill="white"/><rect x="15" y="16" width="4" height="16" rx="1" fill="white"/><rect x="21" y="10" width="4" height="22" rx="1" fill="white"/><path d="M27 10 L32 10 L32 18 M32 10 L25 17" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="f-logo-text">Borcelle · Boracell</span>
+      </div>
+      <div class="f-tagline" data-es="Distribuidor oficial BMW en México. Ventas, renta y servicio certificado en la región noreste." data-en="Official BMW dealer in Mexico. Sales, rental and certified service in the northeast region.">Distribuidor oficial BMW en México. Ventas, renta y servicio certificado en la región noreste.</div>
+    </div>
+    <div class="f-col">
+      <h4 data-es="Navegación" data-en="Navigation">Navegación</h4>
+      <ul>
+        <li><a href="#cars" data-es="Catálogo" data-en="Catalog">Catálogo</a></li>
+        <li><a href="#factory" data-es="Fábrica" data-en="Factory">Fábrica</a></li>
+        <li><a href="#promos" data-es="Promociones" data-en="Promotions">Promociones</a></li>
+        <li><a href="#mechanics" data-es="Mecánica" data-en="Mechanics">Mecánica</a></li>
+      </ul>
+    </div>
+    <div class="f-col">
+      <h4 data-es="Servicios" data-en="Services">Servicios</h4>
+      <ul>
+        <li><a href="#" data-es="Compra" data-en="Purchase">Compra</a></li>
+        <li><a href="#" data-es="Renta diaria" data-en="Daily rental">Renta diaria</a></li>
+        <li><a href="#" data-es="Financiamiento" data-en="Financing">Financiamiento</a></li>
+        <li><a href="#" data-es="Mantenimiento" data-en="Maintenance">Mantenimiento</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="f-copy" data-es="2025 Boracell Distribuciones S.A. de C.V. — Todos los derechos reservados." data-en="2025 Boracell Distribuciones S.A. de C.V. — All rights reserved.">2025 Boracell Distribuciones S.A. de C.V. — Todos los derechos reservados.</div>
+    <div class="f-legal"><a href="#" data-es="Privacidad" data-en="Privacy">Privacidad</a><a href="#" data-es="Términos" data-en="Terms">Términos</a></div>
+  </div>
+</footer>
+
+<!-- VEHICLE MODAL -->
+<div class="overlay" id="modal-vehicle">
+  <div class="v-modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="m-layout">
+      <div class="m-photo" id="m-photo"></div>
+      <div class="m-content">
+        <div class="m-eyebrow">BMW — Boracell MX</div>
+        <h2 class="m-title" id="m-title"></h2>
+        <div class="m-subtitle" id="m-subtitle"></div>
+        <div class="m-specs-title" id="m-specs-title">Especificaciones</div>
+        <div id="m-specs"></div>
+        <div class="m-color-title" id="m-color-title">Color disponible</div>
+        <div class="m-colors" id="m-colors"></div>
+        <div class="m-price-section">
+          <div><div class="mprice-label" id="m-label-buy">Compra</div><div class="mprice-buy" id="m-pbuy"></div><div class="mprice-buy-usd" id="m-pbuy-usd"></div></div>
+          <div style="text-align:right"><div class="mprice-label" id="m-label-rent">Renta / día</div><div class="mprice-rent" id="m-prent"></div><div class="mprice-rent-usd" id="m-prent-usd"></div></div>
+        </div>
+        <div class="m-actions"><button class="ma-buy" id="ma-buy">Comprar</button><button class="ma-rent" id="ma-rent">Rentar</button></div>
+        <div class="m-units" id="m-units"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CART MODAL -->
+<div class="overlay" id="modal-cart">
+  <div class="cart-box">
+    <div class="cart-head"><div class="cart-title">Carrito</div><button class="modal-close" style="position:static;border-radius:50%" onclick="closeCart()">✕</button></div>
+    <div class="cart-items" id="cart-items"></div>
+    <div class="cart-summary" id="cart-summary"></div>
+  </div>
+</div>
+
+<!-- ORDER MODAL -->
+<div class="overlay" id="modal-order">
+  <div class="order-panel" id="op-content"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><div class="toast-title" id="toast-title"></div><div class="toast-msg" id="toast-msg"></div></div>
+
+</div><!-- #app -->
+
+<script>
+const MXN_TO_USD = 0.051;
+let lang = 'es';
+
+function setLang(l) {
+  lang = l;
+  document.getElementById('btn-es').classList.toggle('active', l==='es');
+  document.getElementById('btn-en').classList.toggle('active', l==='en');
+  document.querySelectorAll('[data-es]').forEach(el => {
+    const v = el.getAttribute('data-'+l);
+    if (!v) return;
+    if (el.tagName==='H1' || el.innerHTML.includes('<em>')) el.innerHTML = v;
+    else el.textContent = v;
+  });
+  renderCars(); renderFactory();
+}
+
+const fmtMXN = n => '$' + Math.round(n).toLocaleString('es-MX') + ' MXN';
+const fmtUSD = n => '≈ $' + Math.round(n*MXN_TO_USD).toLocaleString('en-US') + ' USD';
+
+// LOGIN
+document.getElementById('login-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const name  = document.getElementById('login-name').value.trim();
+  const email = document.getElementById('login-email').value.trim();
+  const priv  = document.getElementById('login-privacy').checked;
+  let ok = true;
+  document.getElementById('err-name').classList.remove('show');
+  document.getElementById('err-email').classList.remove('show');
+  document.getElementById('err-privacy').classList.remove('show');
+  if (!name)                            { document.getElementById('err-name').classList.add('show');    ok=false; }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { document.getElementById('err-email').classList.add('show');   ok=false; }
+  if (!priv)                            { document.getElementById('err-privacy').classList.add('show'); ok=false; }
+  if (!ok) return;
+  const ls = document.getElementById('login-screen');
+  ls.classList.add('hidden');
+  setTimeout(() => { ls.style.display='none'; document.getElementById('app').classList.add('visible'); }, 500);
+  showToast(lang==='es' ? `Bienvenido, ${name}` : `Welcome, ${name}`,
+            lang==='es' ? 'Tu cartera de $950,000 MXN está lista.' : 'Your $950,000 MXN wallet is ready.');
+});
+
+// DATA
+const CARS = [
+  { id:1, name:'Serie 3 330i', year:2024, price:698000, rent:3500, units:4,
+    img:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/2022_BMW_330i_%28G20%2C_facelift%29%2C_front_8.20.22.jpg/1280px-2022_BMW_330i_%28G20%2C_facelift%29%2C_front_8.20.22.jpg',
+    colors:[{n:'Alpine White',h:'#f0eeea'},{n:'Black Sapphire',h:'#141414'},{n:'Mineral Grey',h:'#7a7a7a'},{n:'Phytonic Blue',h:'#2a4a6e'}],
+    specs_es:[{k:'Motor',v:'2.0L TwinPower Turbo'},{k:'Potencia',v:'184 CV'},{k:'0-100 km/h',v:'7.1 seg'},{k:'Transmisión',v:'Automática 8 vel.'},{k:'Tracción',v:'RWD'},{k:'Consumo',v:'7.2 L/100km'}],
+    specs_en:[{k:'Engine',v:'2.0L TwinPower Turbo'},{k:'Power',v:'184 HP'},{k:'0-60 mph',v:'6.6 sec'},{k:'Transmission',v:'8-speed Auto'},{k:'Drive',v:'RWD'},{k:'Fuel',v:'7.2 L/100km'}] },
+  { id:2, name:'M3 Competition', year:2024, price:1950000, rent:9800, units:2,
+    img:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/2019_BMW_M3_Competition_%28F80%2C_facelift%29%2C_front_8.27.19.jpg/1280px-2019_BMW_M3_Competition_%28F80%2C_facelift%29%2C_front_8.27.19.jpg',
+    colors:[{n:'Isle of Man Green',h:'#2d5c2e'},{n:'Black Sapphire',h:'#141414'},{n:'Portimao Blue',h:'#1c3a5e'}],
+    specs_es:[{k:'Motor',v:'3.0L M TwinPower'},{k:'Potencia',v:'510 CV'},{k:'0-100 km/h',v:'3.9 seg'},{k:'Transmisión',v:'M Steptronic 8'},{k:'Tracción',v:'M xDrive AWD'},{k:'Vel. máx.',v:'290 km/h'}],
+    specs_en:[{k:'Engine',v:'3.0L M TwinPower'},{k:'Power',v:'503 HP'},{k:'0-60 mph',v:'3.5 sec'},{k:'Transmission',v:'M Steptronic 8'},{k:'Drive',v:'M xDrive AWD'},{k:'Top speed',v:'180 mph'}] },
+  { id:3, name:'X3 M40i', year:2024, price:1180000, rent:5900, units:5,
+    img:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/BMW_X3_M40i_%28G01%29_%E2%80%93_f_08072018.jpg/1280px-BMW_X3_M40i_%28G01%29_%E2%80%93_f_08072018.jpg',
+    colors:[{n:'Mineral White',h:'#e8e6e1'},{n:'Carbon Black',h:'#1a1a1a'},{n:'Phytonic Blue',h:'#2a4a6e'},{n:'Thundernight',h:'#3a1a5a'}],
+    specs_es:[{k:'Motor',v:'3.0L TwinPower I6'},{k:'Potencia',v:'382 CV'},{k:'0-100 km/h',v:'4.5 seg'},{k:'Transmisión',v:'Automática 8 vel.'},{k:'Tracción',v:'xDrive AWD'},{k:'Consumo',v:'9.4 L/100km'}],
+    specs_en:[{k:'Engine',v:'3.0L TwinPower I6'},{k:'Power',v:'382 HP'},{k:'0-60 mph',v:'4.2 sec'},{k:'Transmission',v:'8-speed Auto'},{k:'Drive',v:'xDrive AWD'},{k:'Fuel',v:'9.4 L/100km'}] }
+];
+const FAC = [3,2,1];
+let wallet=950000, cart=[], orders=[], curCar=null, picked={};
+
+function getArrival(type) {
+  const now=new Date();
+  if (type==='buy') {
+    const d=new Date(now.getTime()+(3+Math.floor(Math.random()*3))*86400000);
+    return (lang==='es'?'Entrega: ':'Delivery: ')+d.toLocaleDateString(lang==='es'?'es-MX':'en-US',{weekday:'long',day:'numeric',month:'long'});
+  }
+  const s=new Date(now.getTime()+7200000), e=new Date(s.getTime()+86400000);
+  return (lang==='es'?'Desde ':'From ')+s.toLocaleTimeString(lang==='es'?'es-MX':'en-US',{hour:'2-digit',minute:'2-digit'})+' → '+e.toLocaleDateString(lang==='es'?'es-MX':'en-US',{month:'short',day:'numeric'});
+}
+function getRefund() {
+  const d=new Date(Date.now()+3*86400000);
+  return d.toLocaleDateString(lang==='es'?'es-MX':'en-US',{day:'numeric',month:'long',year:'numeric'});
+}
+
+// TICKER
+(function(){
+  const msgs=['Financiamiento 0% en modelos seleccionados — 0% Financing on select models','Renta desde $3,500 MXN / día — Rental from $179 USD / day','Entrega inmediata CDMX y MTY — Immediate delivery available','Saldo bienvenida $950,000 MXN — Welcome wallet $950,000 MXN','Factory: Serie 3 · M3 Competition · X3 M40i','Descuento 15% rentas semanales Serie M — 15% off weekly M Series'];
+  const el=document.getElementById('ticker-track');
+  if(el) el.innerHTML=[...msgs,...msgs].map(m=>`<span class="ticker-item">${m} &nbsp; —</span>`).join('');
+})();
+
+function renderCars() {
+  const t=lang, el=document.getElementById('v-grid'); if(!el) return;
+  el.innerHTML=CARS.map(c=>`
+    <div class="v-card">
+      <div class="v-img-wrap">
+        <img class="v-img" src="${c.img}" alt="${c.name}" onerror="this.outerHTML='<div class=v-img-fb>${c.name.split(' ').slice(-1)[0]}</div>'">
+        <span class="v-avail ${c.units>0?'avail-y':'avail-n'}">${c.units>0?c.units+(t==='es'?' unid.':' units'):(t==='es'?'Sin stock':'Out of stock')}</span>
+      </div>
+      <div class="v-accent"></div>
+      <div class="v-body">
+        <div class="v-brand">BMW · ${c.year}</div>
+        <div class="v-name">${c.name}</div>
+        <div class="v-engine">${c['specs_'+t][0].v}</div>
+        <div class="v-colors"><span class="v-clabel">Color</span>${c.colors.map((col,i)=>`<div class="vcdot ${i===0?'on':''}" style="background:${col.h}" title="${col.n}"></div>`).join('')}</div>
+        <hr class="v-divider">
+        <div class="v-prices">
+          <div><div class="vp-label">${t==='es'?'Compra':'Purchase'}</div><div class="vp-main">${fmtMXN(c.price)}</div><div class="vp-usd">${fmtUSD(c.price)}</div></div>
+          <div style="text-align:right"><div class="vp-label">${t==='es'?'Renta / día':'Rental / day'}</div><div class="vp-rent">${fmtMXN(c.rent)}</div><div class="vp-rent-usd">${fmtUSD(c.rent)}</div></div>
+        </div>
+        <div class="v-actions">
+          <button class="v-btn-buy" ${c.units===0?'disabled':''} onclick="quickAdd(${c.id},'buy')">${t==='es'?'Comprar':'Buy'}</button>
+          <button class="v-btn-rent" ${c.units===0?'disabled':''} onclick="quickAdd(${c.id},'rent')">${t==='es'?'Rentar':'Rent'}</button>
+          <button class="v-btn-detail" onclick="openModal(${c.id})">${t==='es'?'Ver':'View'}</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderFactory() {
+  const t=lang, el=document.getElementById('fac-grid'); if(!el) return;
+  el.innerHTML=FAC.map(id=>{
+    const c=CARS.find(x=>x.id===id);
+    return `<div class="fac-card" onclick="openModal(${c.id})">
+      <div class="fac-img-wrap">
+        <img class="fac-img" src="${c.img}" alt="${c.name}" onerror="this.outerHTML='<div class=fac-fb>${c.name.split(' ').slice(-1)[0]}</div>'">
+        <span class="v-avail ${c.units>0?'avail-y':'avail-n'}">${c.units>0?c.units+(t==='es'?' unid.':' units'):(t==='es'?'Sin stock':'Out of stock')}</span>
+      </div>
+      <div class="fac-bar"></div>
+      <div class="fac-body">
+        <span class="fac-tag-pill">${t==='es'?'Fabricación Boracell':'Boracell Manufacturing'}</span>
+        <div class="fac-name">${c.name}</div>
+        <div class="fac-engine">${c['specs_'+t][0].v}</div>
+        <div class="fac-specs-mini">${c['specs_'+t].slice(1,5).map(s=>`<div><div class="fsm-k">${s.k}</div><div class="fsm-v">${s.v}</div></div>`).join('')}</div>
+        <div class="fac-footer">
+          <div><div class="fac-pl">${t==='es'?'Precio':'Price'}</div><div class="fac-pv">${fmtMXN(c.price)}</div><div class="fac-pv-usd">${fmtUSD(c.price)}</div></div>
+          <div class="fac-units ${c.units>0?'fu-y':'fu-n'}">${c.units>0?c.units+(t==='es'?' disponibles':' available'):(t==='es'?'Sin stock':'Out of stock')}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openModal(id) {
+  curCar=CARS.find(c=>c.id===id); const c=curCar, t=lang;
+  const photo=document.getElementById('m-photo');
+  photo.innerHTML=`<img src="${c.img}" alt="${c.name}" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:16px 0 0 16px;filter:brightness(.75)" onerror="this.outerHTML='<div class=m-photo-fb>${c.name.split(' ').slice(-1)[0]}</div>'">`;
+  document.getElementById('m-title').textContent=c.name;
+  document.getElementById('m-subtitle').textContent=c.year+' — '+c['specs_'+t][0].v;
+  document.getElementById('m-specs-title').textContent=t==='es'?'Especificaciones':'Specifications';
+  document.getElementById('m-color-title').textContent=t==='es'?'Color disponible':'Available color';
+  document.getElementById('m-pbuy').textContent=fmtMXN(c.price);
+  document.getElementById('m-pbuy-usd').textContent=fmtUSD(c.price);
+  document.getElementById('m-prent').textContent=fmtMXN(c.rent)+(t==='es'?'/día':'/day');
+  document.getElementById('m-prent-usd').textContent=fmtUSD(c.rent)+(t==='es'?'/día':'/day');
+  document.getElementById('m-label-buy').textContent=t==='es'?'Compra':'Purchase';
+  document.getElementById('m-label-rent').textContent=t==='es'?'Renta / día':'Rental / day';
+  document.getElementById('m-specs').innerHTML=c['specs_'+t].map(s=>`<div class="m-spec"><span class="m-spec-k">${s.k}</span><span class="m-spec-v">${s.v}</span></div>`).join('');
+  picked[c.id]=c.colors[0];
+  document.getElementById('m-colors').innerHTML=c.colors.map((col,i)=>`<div class="mc-opt" onclick="pickColor(${c.id},${i})"><div class="mc-sw ${i===0?'sel':''}" id="sw-${c.id}-${i}" style="background:${col.h}"></div><div class="mc-nm">${col.n}</div></div>`).join('');
+  const ok=c.units>0;
+  const bb=document.getElementById('ma-buy'), br=document.getElementById('ma-rent');
+  bb.disabled=!ok; br.disabled=!ok;
+  bb.textContent=t==='es'?'Comprar':'Buy';
+  br.textContent=t==='es'?'Rentar':'Rent';
+  document.getElementById('m-units').innerHTML=ok
+    ?`<span class="unit-ok">${c.units} ${t==='es'?`unidad${c.units!==1?'es':''} disponible${c.units!==1?'s':''}`:`unit${c.units!==1?'s':''} available`}</span>`
+    :`<span class="unit-no">${t==='es'?'Sin unidades disponibles':'No units available'}</span>`;
+  bb.onclick=()=>addToCart(c.id,'buy');
+  br.onclick=()=>addToCart(c.id,'rent');
+  document.getElementById('modal-vehicle').classList.add('open');
+}
+function closeModal(){document.getElementById('modal-vehicle').classList.remove('open')}
+function pickColor(cid,idx){
+  const c=CARS.find(x=>x.id===cid); picked[cid]=c.colors[idx];
+  c.colors.forEach((_,i)=>{const el=document.getElementById(`sw-${cid}-${i}`);if(el)el.classList.toggle('sel',i===idx)});
+}
+function quickAdd(id,type){if(!picked[id])picked[id]=CARS.find(x=>x.id===id).colors[0];addToCart(id,type)}
+
+function addToCart(id,type){
+  const c=CARS.find(x=>x.id===id), color=picked[id]||c.colors[0], price=type==='buy'?c.price:c.rent;
+  cart.push({uid:Date.now(),id,name:c.name,type,price,color:color.n,arrival:getArrival(type)});
+  updateBadge(); closeModal();
+  showToast(lang==='es'?(type==='buy'?'Agregado al carrito':'Renta agregada'):(type==='buy'?'Added to cart':'Rental added'),`${c.name} — ${color.n} — ${fmtMXN(price)}`);
+}
+function removeItem(uid){cart=cart.filter(x=>x.uid!==uid);updateBadge();renderCart()}
+function updateBadge(){document.getElementById('cart-count').textContent=cart.length}
+function openCart(){renderCart();document.getElementById('modal-cart').classList.add('open')}
+function closeCart(){document.getElementById('modal-cart').classList.remove('open')}
+
+function renderCart(){
+  const t=lang, body=document.getElementById('cart-items'), sum=document.getElementById('cart-summary');
+  const tEl=document.querySelector('.cart-title'); if(tEl) tEl.textContent=t==='es'?'Carrito':'Cart';
+  if(!cart.length){body.innerHTML=`<div class="cart-empty">${t==='es'?'El carrito está vacío':'Your cart is empty'}</div>`;sum.innerHTML='';return}
+  body.innerHTML=cart.map(item=>`
+    <div class="cart-row">
+      <div>
+        <div class="cr-name">${item.name}</div>
+        <div class="cr-detail">Color: ${item.color}</div>
+        <span class="cr-badge ${item.type==='buy'?'crb-buy':'crb-rent'}">${item.type==='buy'?(t==='es'?'Compra':'Purchase'):(t==='es'?'Renta/día':'Rental/day')}</span>
+        <div class="cr-arrival">${item.arrival}</div>
+      </div>
+      <div class="cr-right">
+        <div class="cr-price">${fmtMXN(item.price)}</div>
+        <div class="cr-price-usd">${fmtUSD(item.price)}</div>
+        <button class="cr-remove" onclick="removeItem(${item.uid})">${t==='es'?'Eliminar':'Remove'}</button>
+      </div>
+    </div>`).join('');
+  const total=cart.reduce((s,x)=>s+x.price,0), canPay=wallet>=total;
+  sum.innerHTML=`
+    <div class="cs-row"><span class="cs-label">Total</span><div style="text-align:right"><div class="cs-total">${fmtMXN(total)}</div><div class="cs-total-usd">${fmtUSD(total)}</div></div></div>
+    <div class="cs-row" style="margin-bottom:10px"><span class="cs-label">${t==='es'?'Saldo disponible':'Available balance'}</span><span class="cs-wallet">${fmtMXN(wallet)}</span></div>
+    <div class="wallet-status ${canPay?'ws-ok':'ws-fail'}">${canPay?(t==='es'?'Saldo suficiente para confirmar.':'Sufficient balance to confirm.'):(t==='es'?'Saldo insuficiente. Elimina artículos.':'Insufficient balance. Remove items.')}</div>
+    <button class="btn-confirm" ${!canPay?'disabled':''} onclick="confirmOrder()">${t==='es'?'Confirmar operación':'Confirm order'}</button>`;
+}
+
+function confirmOrder(){
+  const total=cart.reduce((s,x)=>s+x.price,0);
+  wallet-=total; document.getElementById('wallet-display').textContent=fmtMXN(wallet);
+  cart.forEach(item=>orders.push({...item,orderId:'BRC-'+Math.random().toString(36).substr(2,7).toUpperCase(),confirmedAt:new Date(),status:'confirmed',refundDeadline:getRefund()}));
+  const lastId=orders[orders.length-1].orderId;
+  cart=[]; updateBadge(); closeCart();
+  showToast(lang==='es'?'Operación confirmada':'Order confirmed',lang==='es'?'Abriendo detalle de tu orden...':'Opening your order details...');
+  setTimeout(()=>openOrderDetail(lastId),400);
+}
+
+function openOrderDetail(orderId){
+  const order=orders.find(o=>o.orderId===orderId); if(!order) return;
+  const t=lang;
+  const steps_es=['Confirmado','Procesando','En tránsito','Entregado'];
+  const steps_en=['Confirmed','Processing','In transit','Delivered'];
+  const steps=t==='es'?steps_es:steps_en;
+  const aStep=order.status==='cancelled'?-1:1;
+  const sLabel={confirmed:{es:'Confirmado',en:'Confirmed',cls:'bl'},cancelled:{es:'Cancelado',en:'Cancelled',cls:'rv'},refunded:{es:'Reembolsado',en:'Refunded',cls:'gn'}}[order.status];
+  const policy=t==='es'
+    ?'Las compras pueden cancelarse dentro de 72 horas sin cargo. Pasado ese plazo, se aplica una retención del 15%. Las rentas no son reembolsables una vez iniciadas.'
+    :'Purchases can be cancelled within 72 hours at no charge. After that, a 15% fee applies. Rentals are non-refundable once started.';
+  document.getElementById('op-content').innerHTML=`
+    <div class="op-header"><div class="op-title">${t==='es'?'Detalle de Orden':'Order Details'}</div><button class="modal-close" style="position:static" onclick="closeOrderDetail()">✕</button></div>
+    <div class="op-body">
+      ${order.status!=='cancelled'?`<div class="op-status-bar">${steps.map((s,i)=>`<div class="op-step ${i<aStep?'done':i===aStep?'active':''}"><div class="op-dot">${i<aStep?'✓':i+1}</div><div class="op-step-label">${s}</div></div>`).join('')}</div>`
+      :`<div style="background:rgba(255,69,58,.08);border:1px solid rgba(255,69,58,.2);border-radius:8px;padding:12px 16px;margin-bottom:24px;color:#ff453a;font-size:12px">${t==='es'?'Esta orden fue cancelada y reembolsada.':'This order was cancelled and refunded.'}</div>`}
+      <div class="op-section">
+        <div class="op-section-title">${t==='es'?'Información de orden':'Order information'}</div>
+        <div class="op-row"><span class="op-key">${t==='es'?'Número':'Order #'}</span><span class="op-val bl">${order.orderId}</span></div>
+        <div class="op-row"><span class="op-key">${t==='es'?'Tipo':'Type'}</span><span class="op-val">${order.type==='buy'?(t==='es'?'Compra':'Purchase'):(t==='es'?'Renta':'Rental')}</span></div>
+        <div class="op-row"><span class="op-key">${t==='es'?'Estado':'Status'}</span><span class="op-val ${sLabel.cls}">${sLabel[t]}</span></div>
+        <div class="op-row"><span class="op-key">${t==='es'?'Fecha':'Date'}</span><span class="op-val">${order.confirmedAt.toLocaleDateString(t==='es'?'es-MX':'en-US',{day:'numeric',month:'long',year:'numeric'})}</span></div>
+      </div>
+      <div class="op-section">
+        <div class="op-section-title">${t==='es'?'Vehículo':'Vehicle'}</div>
+        <div class="op-row"><span class="op-key">${t==='es'?'Modelo':'Model'}</span><span class="op-val">${order.name}</span></div>
+        <div class="op-row"><span class="op-key">${t==='es'?'Color':'Color'}</span><span class="op-val">${order.color}</span></div>
+        <div class="op-row"><span class="op-key">${order.type==='buy'?(t==='es'?'Entrega estimada':'Est. delivery'):(t==='es'?'Periodo':'Period')}</span><span class="op-val">${order.arrival}</span></div>
+      </div>
+      <div class="op-section">
+        <div class="op-section-title">${t==='es'?'Desglose financiero':'Financial breakdown'}</div>
+        <div class="op-row"><span class="op-key">MXN</span><span class="op-val">${fmtMXN(order.price)}</span></div>
+        <div class="op-row"><span class="op-key">USD</span><span class="op-val">${fmtUSD(order.price)}</span></div>
+        <div class="op-row"><span class="op-key">${t==='es'?'Tipo de cambio':'Rate'}</span><span class="op-val">$1 USD = $${(1/MXN_TO_USD).toFixed(1)} MXN</span></div>
+        <div class="op-row"><span class="op-key">${t==='es'?'Método':'Payment'}</span><span class="op-val">${t==='es'?'Cartera Boracell':'Boracell Wallet'}</span></div>
+      </div>
+      <div class="op-section">
+        <div class="op-section-title">${t==='es'?'Política de cancelación':'Cancellation policy'}</div>
+        <div class="op-policy"><div class="op-policy-title">${t==='es'?'Condiciones':'Terms'}</div><p>${policy}</p></div>
+        ${order.status==='confirmed'?`<div class="op-row"><span class="op-key">${t==='es'?'Cancelación gratis hasta':'Free cancellation until'}</span><span class="op-val yl">${order.refundDeadline}</span></div>`:''}
+      </div>
+      <div class="op-actions">
+        <button class="op-btn-cancel" ${order.status!=='confirmed'?'disabled':''} onclick="cancelOrder('${order.orderId}')">${t==='es'?'Cancelar y reembolsar':'Cancel & refund'}</button>
+        <button class="op-btn-close" onclick="closeOrderDetail()">${t==='es'?'Cerrar':'Close'}</button>
+      </div>
+    </div>`;
+  document.getElementById('modal-order').classList.add('open');
+}
+
+function closeOrderDetail(){document.getElementById('modal-order').classList.remove('open')}
+
+function cancelOrder(orderId){
+  const order=orders.find(o=>o.orderId===orderId);
+  if(!order||order.status!=='confirmed') return;
+  order.status='cancelled'; wallet+=order.price;
+  document.getElementById('wallet-display').textContent=fmtMXN(wallet);
+  closeOrderDetail();
+  showToast(lang==='es'?'Orden cancelada':'Order cancelled',`${order.name} — ${lang==='es'?'Reembolso de':'Refund of'} ${fmtMXN(order.price)} ${lang==='es'?'aplicado.':'applied.'}`);
+}
+
+function showToast(title,msg){
+  document.getElementById('toast-title').textContent=title;
+  document.getElementById('toast-msg').textContent=msg;
+  const el=document.getElementById('toast'); el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),3600);
+}
+
+['modal-vehicle','modal-cart','modal-order'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el) el.addEventListener('click',e=>{
+    if(e.target===e.currentTarget){if(id==='modal-vehicle')closeModal();else if(id==='modal-cart')closeCart();else closeOrderDetail()}
+  });
+});
+
+renderCars(); renderFactory();
+</script>
+</body>
+</html>
