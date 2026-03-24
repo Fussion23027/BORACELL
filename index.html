@@ -65,6 +65,8 @@ body{background:var(--bg);color:var(--tx);font-family:'Inter',-apple-system,sans
   transform:skewX(-8deg);z-index:2;
   box-shadow:-8px 0 40px rgba(204,28,28,.45);
 }
+
+  /*Logo e INTR*/
 .ls-logo{
   position:absolute;top:40px;left:48px;z-index:4;
   display:flex;align-items:center;gap:9px;
@@ -179,7 +181,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Inter',-apple-system,sans
 .btn-cart:hover{background:var(--red2)}
 .cart-badge{background:rgba(255,255,255,.2);color:#fff;font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center}
 
-/* HERO */
+/* Backguond the car */
 #hero{
   margin-top:52px;position:relative;overflow:hidden;
   min-height:90vh;display:flex;align-items:flex-end;padding-bottom:80px;
@@ -472,7 +474,7 @@ footer{background:var(--bg1);padding:56px 80px 28px;border-top:1px solid var(--b
 </head>
 <body>
 
-<!-- ═══════════ LOGIN ═══════════ -->
+<!--  LOGIN  -->
 <div id="login-screen">
   <div class="ls-left">
     <div class="ls-car-bg"></div>
@@ -524,7 +526,7 @@ footer{background:var(--bg1);padding:56px 80px 28px;border-top:1px solid var(--b
   </div>
 </div>
 
-<!-- ═══════════ APP ═══════════ -->
+<!-- APP -->
 <div id="app">
 
 <nav id="nav">
@@ -717,7 +719,7 @@ footer{background:var(--bg1);padding:56px 80px 28px;border-top:1px solid var(--b
   </div>
 </div>
 
-<!-- CART MODAL -->
+<!-- CART MODAL IN CAR -->
 <div class="overlay" id="modal-cart">
   <div class="cart-box">
     <div class="cart-head"><div class="cart-title">Carrito</div><button class="modal-close" style="position:static;border-radius:50%" onclick="closeCart()">✕</button></div>
@@ -726,7 +728,7 @@ footer{background:var(--bg1);padding:56px 80px 28px;border-top:1px solid var(--b
   </div>
 </div>
 
-<!-- ORDER MODAL -->
+<!-- ORDER MODAL IN SERVICE-->
 <div class="overlay" id="modal-order">
   <div class="order-panel" id="op-content"></div>
 </div>
@@ -777,7 +779,7 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
             lang==='es' ? 'Tu cartera de $950,000 MXN está lista.' : 'Your $950,000 MXN wallet is ready.');
 });
 
-// DATA
+// DATA SYSTEM
 const CARS = [
   { id:1, name:'Serie 3 330i', year:2024, price:698000, rent:3500, units:4,
     img:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/2022_BMW_330i_%28G20%2C_facelift%29%2C_front_8.20.22.jpg/1280px-2022_BMW_330i_%28G20%2C_facelift%29%2C_front_8.20.22.jpg',
@@ -907,6 +909,7 @@ function pickColor(cid,idx){
 }
 function quickAdd(id,type){if(!picked[id])picked[id]=CARS.find(x=>x.id===id).colors[0];addToCart(id,type)}
 
+/*Add Car*/
 function addToCart(id,type){
   const c=CARS.find(x=>x.id===id), color=picked[id]||c.colors[0], price=type==='buy'?c.price:c.rent;
   cart.push({uid:Date.now(),id,name:c.name,type,price,color:color.n,arrival:getArrival(type)});
